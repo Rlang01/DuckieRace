@@ -1,0 +1,12 @@
+camera:
+  angle: 30
+  height: 30
+params:
+  topLimit: 0.5
+calibration:
+  d1: 20
+  d2: 25
+  d3: 15
+
+
+

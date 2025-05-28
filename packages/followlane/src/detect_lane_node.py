@@ -67,7 +67,6 @@ class DetectLaneNode(DTROS):
                            (self.hue_white_l,self.saturation_white_l, self.lightness_white_l), 
                            (self.hue_white_h,self.saturation_white_h, self.lightness_white_h),)
 
-
         center_white = np.mean(np.where(mask_white != 0))
         center_yellow = np.mean(np.where(mask_yellow != 0))
 
