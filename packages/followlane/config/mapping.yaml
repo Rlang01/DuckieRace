@@ -1,12 +1,17 @@
-camera:
-  angle: 30
-  height: 30
 params:
-  topLimit: 0.5
+  topLimit: 0.3
 calibration:
   d1: 20
   d2: 25
   d3: 15
+  chess_pt1_x: 850
+  chess_pt1_y: 1670
+  chess_pt2_x: 2120
+  chess_pt2_y: 1670
+  chess_pt3_x: 550
+  chess_pt3_y: 2840
+  chess_pt4_x: 2450
+  chess_pt4_y: 2840
 
 
 
