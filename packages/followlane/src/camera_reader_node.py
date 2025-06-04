@@ -22,6 +22,7 @@ class CameraReaderNode(DTROS):
         # bridge between OpenCV and ROS
         self._bridge = CvBridge()
 
+
         with open('packages/followlane/config/detect_lane.yaml','r') as f:
             text = f.read()
         self.conf = yaml.safe_load(text)
@@ -54,7 +55,18 @@ class CameraReaderNode(DTROS):
 
                 x_alt = x
                 y_alt = y
+        elif self.selected.get() == 'mapping':
+            x_alt = 0
+            y_alt = 0
+            for point in ['chess_pt1','chess_pt2','chess_pt3','chess_pt4','chess_pt1']:
+                x = self.conf['lane_image'][f'{point}_x']
+                y = self.conf['lane_image'][f'{point}_y']
 
+                if x_alt != 0 or y_alt != 0:
+                    image = cv2.line(image,(x_alt,y_alt),(x,y),(255,255,255),2 )
+
+                x_alt = x
+                y_alt = y
         else:
             hl = self.conf[self.selected.get()]['hl']
             hh = self.conf[self.selected.get()]['hh'] 

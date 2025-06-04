@@ -104,9 +104,6 @@ class MappingNode(DTROS):
         self.conf = yaml.safe_load(text)
 
         self.top_cutoff = self.conf['params']['topLimit']
-        self.d1 = self.conf['calibration']['d1']
-        self.d2 = self.conf['calibration']['d2']
-        self.d3 = self.conf['calibration']['d3']
         self.pt_orig = [[self.conf['calibration']['chess_pt1_x'],self.conf['calibration']['chess_pt1_y']],
                         [self.conf['calibration']['chess_pt2_x'],self.conf['calibration']['chess_pt2_y']],
                         [self.conf['calibration']['chess_pt3_x'],self.conf['calibration']['chess_pt3_y']],
