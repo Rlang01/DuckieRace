@@ -18,7 +18,7 @@ class MappingNode(DTROS):
         # initialize the DTROS parent class
         super(MappingNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
         self._bridge = CvBridge()
-        self.load_conf('packages/followlane/config/mapping.yaml')
+        self.load_conf('packages/followlane/config/detect_lane.yaml')
         self._vehicle_name = os.environ['VEHICLE_NAME']
         self._camera_topic = f"/{self._vehicle_name}/camera_node/image/compressed"
         
@@ -103,7 +103,7 @@ class MappingNode(DTROS):
 
         self.conf = yaml.safe_load(text)
 
-        self.top_cutoff = self.conf['params']['topLimit']
+        self.top_cutoff = self.conf['calibration']['topLimit']
         self.pt_orig = [[self.conf['calibration']['chess_pt1_x'],self.conf['calibration']['chess_pt1_y']],
                         [self.conf['calibration']['chess_pt2_x'],self.conf['calibration']['chess_pt2_y']],
                         [self.conf['calibration']['chess_pt3_x'],self.conf['calibration']['chess_pt3_y']],

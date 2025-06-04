@@ -51,7 +51,7 @@ class CameraReaderNode(DTROS):
                 y = self.conf['lane_image'][f'{point}_y']
 
                 if x_alt != 0 or y_alt != 0:
-                    image = cv2.line(image,(x_alt,y_alt),(x,y),(255,255,255),2 )
+                    image = cv2.line(image,(x_alt,y_alt),(x,y),(255,255,255), 2)
 
                 x_alt = x
                 y_alt = y
@@ -63,10 +63,13 @@ class CameraReaderNode(DTROS):
                 y = self.conf['lane_image'][f'{point}_y']
 
                 if x_alt != 0 or y_alt != 0:
-                    image = cv2.line(image,(x_alt,y_alt),(x,y),(255,255,255),2 )
+                    image = cv2.line(image,(x_alt,y_alt),(x,y),(255,255,255), 2)
 
                 x_alt = x
                 y_alt = y
+            y_max, x_max = image.shape
+            y_cutoff = int(y_max * self.conf['mapping']['topLimit'])
+            image = cv2.line(image, (0, y_cutoff), (x_max, y_cutoff), (255,255,255), 3)
         else:
             hl = self.conf[self.selected.get()]['hl']
             hh = self.conf[self.selected.get()]['hh'] 
