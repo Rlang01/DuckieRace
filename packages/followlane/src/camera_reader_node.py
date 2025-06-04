@@ -59,15 +59,15 @@ class CameraReaderNode(DTROS):
             x_alt = 0
             y_alt = 0
             for point in ['chess_pt1','chess_pt2','chess_pt3','chess_pt4','chess_pt1']:
-                x = self.conf['lane_image'][f'{point}_x']
-                y = self.conf['lane_image'][f'{point}_y']
+                x = self.conf['mapping'][f'{point}_x']
+                y = self.conf['mapping'][f'{point}_y']
 
                 if x_alt != 0 or y_alt != 0:
                     image = cv2.line(image,(x_alt,y_alt),(x,y),(255,255,255), 2)
 
                 x_alt = x
                 y_alt = y
-            y_max, x_max = image.shape
+            y_max, x_max, _ = image.shape
             y_cutoff = int(y_max * self.conf['mapping']['topLimit'])
             image = cv2.line(image, (0, y_cutoff), (x_max, y_cutoff), (255,255,255), 3)
         else:
@@ -88,9 +88,12 @@ class CameraReaderNode(DTROS):
         self.panel.image = image
 
     def update_conf(self):
-        for val in self.conf[self.selected.get()]:
-            name = f'{self.selected.get()}_{val}'
-            self.conf[self.selected.get()][val] = self.sliders[name].get()
+        try:
+            for val in self.conf[self.selected.get()]:
+                name = f'{self.selected.get()}_{val}'
+                self.conf[self.selected.get()][val] = self.sliders[name].get()
+        except:
+            print("error in update_conf")
 
     
     def print_conf(self):

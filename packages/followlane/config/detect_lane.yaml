@@ -1,10 +1,10 @@
 duck:
-  hh: 21
-  hl: 0
+  hh: 83
+  hl: 15
   sh: 255
-  sl: 220
+  sl: 150
   vh: 255
-  vl: 200
+  vl: 113
 lane_image:
   bottom_left_x: 720
   bottom_left_y: 444
