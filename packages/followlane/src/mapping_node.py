@@ -4,6 +4,7 @@ import os
 import rospy
 import numpy as np
 import cv2
+from cv_bridge import CvBridge
 from std_msgs.msg import Float64
 from sensor_msgs.msg import CompressedImage
 from enum import Enum
@@ -16,7 +17,7 @@ class MappingNode(DTROS):
     def __init__(self, node_name):
         # initialize the DTROS parent class
         super(MappingNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
-
+        self._bridge = CvBridge()
         self.load_conf('packages/followlane/config/mapping.yaml')
         self._vehicle_name = os.environ['VEHICLE_NAME']
         self._camera_topic = f"/{self._vehicle_name}/camera_node/image/compressed"
