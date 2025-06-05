@@ -6,7 +6,7 @@ source /environment.sh
 dt-launchfile-init
 
 # launch subscriber
-rosrun mapping mapping_node.py
+rosrun followlane mapping mapping_node.py
 
 # wait for app to end
 dt-launchfile-join
