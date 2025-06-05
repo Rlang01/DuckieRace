@@ -36,7 +36,7 @@ class DetectDuckiebotNode(DTROS):
             return
         self.counter += 1
 
-        # CompressedImage in OpenCV-Image umwandeln (wie in funktionierender Node)
+        # CompressedImage in OpenCV-Image umwandeln
         try:
             cv_image = self.bridge.compressed_imgmsg_to_cv2(image_msg, desired_encoding="bgr8")
         except Exception as e:
