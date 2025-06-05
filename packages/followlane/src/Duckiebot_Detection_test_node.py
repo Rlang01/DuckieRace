@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 
 import rospy
+import os
 import cv2
 import numpy as np
-import os
 from duckietown.dtros import DTROS, NodeType
 from sensor_msgs.msg import CompressedImage, Image
 from ultralytics import YOLO
 from cv_bridge import CvBridge
 
-
 class DetectDuckiebotNode(DTROS):
     def __init__(self, node_name):
         super(DetectDuckiebotNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
-        
+
         # YOLO Modell laden
-        self._model = YOLO("packages/followlane/assets/model.pt")  
+        self._model = YOLO("packages/followlane/assets/model.pt")
 
         # Fahrzeugname aus Umgebungsvariablen
         self._vehicle_name = os.environ['VEHICLE_NAME']
@@ -37,9 +36,12 @@ class DetectDuckiebotNode(DTROS):
             return
         self.counter += 1
 
-        # CompressedImage in OpenCV-Image umwandeln
-        np_arr = np.frombuffer(image_msg.data, np.uint8)
-        cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        # CompressedImage in OpenCV-Image umwandeln (wie in funktionierender Node)
+        try:
+            cv_image = self.bridge.compressed_imgmsg_to_cv2(image_msg, desired_encoding="bgr8")
+        except Exception as e:
+            rospy.logerr(f"Fehler beim Dekodieren des Bildes: {e}")
+            return
 
         # YOLO Inferenz
         results = self._model(cv_image)
@@ -47,15 +49,17 @@ class DetectDuckiebotNode(DTROS):
         # Bounding Boxes zeichnen
         image_with_boxes = self.draw_bounding_boxes(results, cv_image)
 
-        # Bild zurück in ROS-Image konvertieren und publishen
+        # Bild veröffentlichen (ROS)
         msg = self.bridge.cv2_to_imgmsg(image_with_boxes, "bgr8")
         self.pub_image.publish(msg)
-        cv2.imshow("Duckiebotaugemacher", image_with_boxes )
+
+        # Bild auch lokal anzeigen
+        cv2.imshow("Duckiebot Detection", image_with_boxes)
+        cv2.waitKey(1)
 
     def draw_bounding_boxes(self, results, img):
         for result in results:
             for box in result.boxes:
-                # Koordinaten abrufen
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 class_id = int(box.cls[0])
                 conf = box.conf[0]
@@ -66,7 +70,6 @@ class DetectDuckiebotNode(DTROS):
                     cv2.putText(img, f"Duckiebot {conf:.2f}", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         return img
-
 
 if __name__ == '__main__':
     node = DetectDuckiebotNode(node_name='detect_duckiebot_node')
