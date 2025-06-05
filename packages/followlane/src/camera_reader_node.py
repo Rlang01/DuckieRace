@@ -136,6 +136,9 @@ class CameraReaderNode(DTROS):
 
                 if option == 'lane_image':
                     self.sliders[name] = tk.Scale(frame, from_=-100, to=700,orient='horizontal',label=val)
+                elif option == 'mapping':
+                    y, x, _ = img.shape
+                    self.sliders[name] = tk.Scale(frame, from_=0, to=2000,orient='horizontal',label=val)
                 else:
                     self.sliders[name] = tk.Scale(frame, from_=0, to=255,orient='horizontal',label=val)
                 self.sliders[name].set(self.conf[option][val])
