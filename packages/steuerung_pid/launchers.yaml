@@ -1,0 +1,4 @@
+launchers:
+  wheel_control:
+    description: "Contrôle manuel des roues avec rosrun"
+    launch_file: "launchers/wheel_control.launch.sh"

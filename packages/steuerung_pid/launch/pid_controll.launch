@@ -1,0 +1,9 @@
+steuerung_pid/
+├── scripts/
+│   └── pid_controller_node.py       # main nod
+├── config/
+│   └── pid_params.yaml              #  PID werten folder
+├── launch/
+│   └── pid_control.launch           # nod launch folder
+├── CMakeLists.txt
+├── package.xml
