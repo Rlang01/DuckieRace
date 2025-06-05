@@ -50,6 +50,7 @@ class DetectDuckiebotNode(DTROS):
         # Bild zurück in ROS-Image konvertieren und publishen
         msg = self.bridge.cv2_to_imgmsg(image_with_boxes, "bgr8")
         self.pub_image.publish(msg)
+        cv2.imshow("Duckiebotaugemacher", image_with_boxes )
 
     def draw_bounding_boxes(self, results, img):
         for result in results:
