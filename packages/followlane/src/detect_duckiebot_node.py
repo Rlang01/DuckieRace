@@ -14,7 +14,7 @@ class DetectDuckiebotNode(DTROS):
         super(DetectDuckiebotNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
 
         # YOLO Modell laden
-        self._model = YOLO("packages/followlane/assets/model.pt")
+        self._model = YOLO("packages/followlane/assets/best_duckiebot.pt")
 
         # Fahrzeugname aus Umgebungsvariablen
         self._vehicle_name = os.environ['VEHICLE_NAME']
@@ -29,7 +29,8 @@ class DetectDuckiebotNode(DTROS):
 
         self.bridge = CvBridge()
         self.counter = 0
-
+        
+        #nur jedes dritte Bild wird ausgewertet um Rechenleistung zu sparen
     def cbDetectObjects(self, image_msg):
         if self.counter % 3 != 0:
             self.counter += 1
