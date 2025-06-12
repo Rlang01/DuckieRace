@@ -8,6 +8,7 @@ from std_msgs.msg import Float64
 from sensor_msgs.msg import CompressedImage
 from enum import Enum
 import yaml
+from scipy.stats import linregress
 
 
 from duckietown.dtros import DTROS, NodeType
@@ -67,17 +68,17 @@ class DetectLaneNode(DTROS):
                            (self.hue_white_l,self.saturation_white_l, self.lightness_white_l), 
                            (self.hue_white_h,self.saturation_white_h, self.lightness_white_h),)
 
-        center_white = np.mean(np.where(mask_white != 0))
-        center_yellow = np.mean(np.where(mask_yellow != 0))
+        coords = cv2.findNonZero(mask_yellow) #get the x/y values of the masked pixels
+        x, y = coords.T
+        yellow_slope, yellow_intercept, yellow_r_value, _, _ = linregress(x, y) # find regression line
+        coords = cv2.findNonZero(mask_white) #get the x/y values of the masked pixels
+        x, y = coords.T
+        white_slope, white_intercept, white_r_value, _, _ = linregress(x, y) # find regression line
 
-        if np.isnan(center_white):
-            center_white = 100
-
-        if np.isnan(center_yellow):
-            center_yellow = 900
+        target_x = ((- white_intercept / white_slope) - (yellow_intercept / yellow_slope)) / 2
 
         msg_desired_center = Float64()
-        msg_desired_center.data = (center_white + center_yellow) / 2
+        msg_desired_center.data = target_x
         self.pub_lane.publish(msg_desired_center)
 
     def load_conf(self,path):

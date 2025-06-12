@@ -38,4 +38,6 @@ mapping:
   chess_pt4_x: 2450
   chess_pt4_y: 2840
   topLimit: 0.3
+map_present:
+  test: 1
 
