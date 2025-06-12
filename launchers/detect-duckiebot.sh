@@ -6,7 +6,7 @@ source /environment.sh
 dt-launchfile-init
 
 # launch subscriber
-rosrun followlane detect_duckiebot_test_node.py
+rosrun followlane detect_duckiebot_node.py
 
 # wait for app to end
 dt-launchfile-join
