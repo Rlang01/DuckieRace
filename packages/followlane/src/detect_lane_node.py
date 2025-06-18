@@ -76,9 +76,9 @@ class DetectLaneNode(DTROS):
         white_slope, white_intercept, white_r_value, _, _ = linregress(x, y) # find regression line
 
         target_x = ((- white_intercept / white_slope) - (yellow_intercept / yellow_slope)) / 2
-
+        error = img.shape[1] - target_x
         msg_desired_center = Float64()
-        msg_desired_center.data = target_x
+        msg_desired_center.data = error
         self.pub_lane.publish(msg_desired_center)
 
     def load_conf(self,path):
