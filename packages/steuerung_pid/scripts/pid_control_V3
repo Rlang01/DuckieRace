@@ -4,45 +4,45 @@ import os
 import rospy
 from duckietown.dtros import DTROS, NodeType
 from duckietown_msgs.msg import Twist2DStamped
-from std_msgs.msg import Float32
 
-# Paramètres de vitesse
-VELOCITY = 0.25     # vitesse linéaire m/s
-GAIN_P = 5.0        # gain proportionnel (à ajuster selon performance)
+# Parameter für Twist-Befehle
+VELOCITY = 0.3  # lineare Geschwindigkeit in m/s, vorwärts (+)
+OMEGA    = 2.0  # Winkelgeschwindigkeit in rad/s, gegen den Uhrzeigersinn (+)
 
-class LineFollowerNode(DTROS):
+class TwistControlNode(DTROS):
 
     def __init__(self, node_name):
-        super(LineFollowerNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
+        # Initialisierung des Knotens
+        super(TwistControlNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
 
+        # Name des Fahrzeugs aus Umgebungsvariable
         vehicle_name = os.environ['VEHICLE_NAME']
-        twist_topic = f"/{vehicle_name}/car_cmd_switch_node/cmd"
 
-        self._v = VELOCITY
-        self._omega = 0.0  # initialement droit
+        # Ziel-Topic für Twist-Befehle
+        twist_topic  = f"/{vehicle_name}/car_cmd_switch_node/cmd"
 
+        # Speichern der gewünschten Werte für v und omega
+        self._v     = VELOCITY
+        self._omega = OMEGA
+
+        # Publisher für Bewegungsbefehle
         self._publisher = rospy.Publisher(twist_topic, Twist2DStamped, queue_size=1)
-        self._subscriber = rospy.Subscriber("/detected_line_position", Float32, self.callback_position)
-
-    def callback_position(self, msg):
-        # L’erreur de position est fournie par le système de vision (ligne au sol)
-        position_error = msg.data  # typiquement entre -1.0 (gauche) et +1.0 (droite)
-        self._omega = -GAIN_P * position_error  # correction (signe négatif = feedback inverse)
 
     def run(self):
-        rate = rospy.Rate(10)  # 10 Hz
+        # Schleife zur kontinuierlichen Veröffentlichung der Bewegungsbefehle
+        rate = rospy.Rate(10)  # Frequenz: 10 Hz
+        message = Twist2DStamped(v=self._v, omega=self._omega)
         while not rospy.is_shutdown():
-            msg = Twist2DStamped()
-            msg.v = self._v
-            msg.omega = self._omega
-            self._publisher.publish(msg)
+            self._publisher.publish(message)
             rate.sleep()
 
     def on_shutdown(self):
+        # Stoppt das Fahrzeug beim Herunterfahren
         stop = Twist2DStamped(v=0.0, omega=0.0)
         self._publisher.publish(stop)
 
 if __name__ == '__main__':
-    node = LineFollowerNode(node_name='twist_line_follower_node')
+    node = TwistControlNode(node_name='twist_control_node')
     node.run()
     rospy.spin()
+
