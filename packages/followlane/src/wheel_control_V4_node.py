@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+f#!/usr/bin/env python3
 
 import os
 import rospy
@@ -21,7 +21,7 @@ class LineFollowerNode(DTROS):
         self._publisher = rospy.Publisher(wheels_topic, WheelsCmdStamped, queue_size=1)
 
         # Abonnement à la position de la ligne détectée
-        rospy.Subscriber("/detected_line_position", Float32, self.callback_position)
+        rospy.Subscriber(f"/{self._vehicle_name}/detect/lane", Float64, self.callback_position, queue_size=1)
 
         self.base_speed = 0.4  # vitesse de base constante
         self.k_p = 0.6         # coefficient proportionnel à ajuster
