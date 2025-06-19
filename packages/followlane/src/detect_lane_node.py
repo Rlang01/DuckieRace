@@ -31,7 +31,6 @@ class DetectLaneNode(DTROS):
 
     def crop_img(self,img):
         img = img.copy()
-        print(img.shape)
 
         pts1 = np.float32([
             [self.conf['lane_image']['top_left_x'],     self.conf['lane_image']['top_left_y']],
@@ -78,7 +77,7 @@ class DetectLaneNode(DTROS):
 
             target_x = ((- white_intercept / white_slope) - (yellow_intercept / yellow_slope)) / 2
             error = img.shape[1] - target_x
-            print(f"error: {error}, white r^2: {white_r_value ** 2}, yellow r^2: {yellow_r_value ** 2}")
+            print(f"error: {error}, white r^2: {round(white_r_value ** 2,2)}, yellow r^2: {round(yellow_r_value ** 2,)}")
             self.show_view(img, [yellow_slope, yellow_intercept, yellow_r_value], [white_slope, white_intercept, white_r_value])
         except:
             error = 0
@@ -88,7 +87,7 @@ class DetectLaneNode(DTROS):
         msg_desired_center.data = error
         self.pub_lane.publish(msg_desired_center)
 
-    def show_view(self, img, yellow_data, white_data):
+    def show_view(self, img, yellow_data=[0,0,0], white_data=[0,0,0]):
         # draw a yellow line on th image
         cv2.line(img, (0, yellow_data[1]), (img.shape[1], img.shape[1] * yellow_data[0] + yellow_data[1]), (255, 222, 89), 2)
         cv2.putText(img, f"R^2: {round(yellow_data[2] ** 2, 2)}", (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 222, 89), 2)
