@@ -23,7 +23,7 @@ class TwistControlNode(DTROS):
         self._omega = 0.0
 
         self._publisher = rospy.Publisher(twist_topic, Twist2DStamped, queue_size=1)
-        rospy.Subscriber(vision_topic, Float64, self.callback_position)
+        rospy.Subscriber(f"/{self._vehicle_name}/detect/lane", Float64, self.callback_position, queue_size=1)
 
     def callback_position(self, msg):
         self.error = msg.data
