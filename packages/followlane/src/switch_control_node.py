@@ -28,11 +28,13 @@ class SwitchControlNode(DTROS):
 
 
     def cbDuckieDetected(self, msg):
-        print('received message')
-        # Write your own code her
+        print('Duckiebot detected')
+        # if duckiebot detected and in followLane-mode --> switch to bypassObstacle
+        if self._control_mode == ControlType.followLane:
+            self._control_mode = ControlType.bypassObstacle
 
     def cbLaneDetected(self, msg):
-        print('received message')
+        print('Lane detected')
         # Write your own code her
 
     def run(self):

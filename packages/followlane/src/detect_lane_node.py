@@ -77,7 +77,7 @@ class DetectLaneNode(DTROS):
 
             target_x = ((- white_intercept / white_slope) - (yellow_intercept / yellow_slope)) / 2
             error = img.shape[1] - target_x
-            print(f"error: {error}, white r^2: {round(white_r_value ** 2,2)}, yellow r^2: {round(yellow_r_value ** 2,)}")
+            print(f"error: {round(error,2)}, white r^2: {round(white_r_value ** 2,2)}, yellow r^2: {round(yellow_r_value ** 2,)}")
             view_data_y = [yellow_slope, yellow_intercept, yellow_r_value]
             view_data_w = [white_slope, white_intercept, white_r_value]
         except:
@@ -102,10 +102,10 @@ class DetectLaneNode(DTROS):
     def show_view(self, img, yellow_data=[0,0,0], white_data=[0,0,0]):
         # draw a yellow line on th image
         cv2.line(img, (0, int(yellow_data[1])), (img.shape[1], int(img.shape[1] * yellow_data[0] + yellow_data[1])), (255, 222, 89), 2)
-        cv2.putText(img, f"R^2: {round(yellow_data[2] ** 2, 2)}", (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 222, 89), 2)
+        cv2.putText(img, f"Y: {round(yellow_data[2] ** 2, 2)}", (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 222, 89), 2)
         # draw a yellow line on th image
         cv2.line(img, (0, int(white_data[1])), (img.shape[1], int(img.shape[1] * white_data[0] + white_data[1])), (255, 0, 0), 2)
-        cv2.putText(img, f"R^2: {round(white_data[2] ** 2, 2)}", (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        cv2.putText(img, f"W: {round(white_data[2] ** 2, 2)}", (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
 
         return img
         
