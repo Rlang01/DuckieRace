@@ -68,18 +68,36 @@ class DetectLaneNode(DTROS):
                            (self.hue_white_l,self.saturation_white_l, self.lightness_white_l), 
                            (self.hue_white_h,self.saturation_white_h, self.lightness_white_h),)
 
-        coords = cv2.findNonZero(mask_yellow) #get the x/y values of the masked pixels
-        x, y = coords.T
-        yellow_slope, yellow_intercept, yellow_r_value, _, _ = linregress(x, y) # find regression line
-        coords = cv2.findNonZero(mask_white) #get the x/y values of the masked pixels
-        x, y = coords.T
-        white_slope, white_intercept, white_r_value, _, _ = linregress(x, y) # find regression line
+        try:
+            coords = cv2.findNonZero(mask_yellow) #get the x/y values of the masked pixels
+            x, y = coords.T
+            yellow_slope, yellow_intercept, yellow_r_value, _, _ = linregress(x, y) # find regression line
+            coords = cv2.findNonZero(mask_white) #get the x/y values of the masked pixels
+            x, y = coords.T
+            white_slope, white_intercept, white_r_value, _, _ = linregress(x, y) # find regression line
 
-        target_x = ((- white_intercept / white_slope) - (yellow_intercept / yellow_slope)) / 2
-        error = img.shape[1] - target_x
+            target_x = ((- white_intercept / white_slope) - (yellow_intercept / yellow_slope)) / 2
+            error = img.shape[1] - target_x
+            print(f"error: {error}, white r^2: {white_r_value ** 2}, yellow r^2: {yellow_r_value ** 2}")
+            self.show_view(img, [yellow_slope, yellow_intercept, yellow_r_value], [white_slope, white_intercept, white_r_value])
+        except:
+            error = 0
+            print("error in lane detection")
+
         msg_desired_center = Float64()
         msg_desired_center.data = error
         self.pub_lane.publish(msg_desired_center)
+
+    def show_view(self, img, yellow_data, white_data):
+        # draw a yellow line on th image
+        cv2.line(img, (0, yellow_data[1]), (img.shape[1], img.shape[1] * yellow_data[0] + yellow_data[1]), (255, 222, 89), 2)
+        cv2.putText(img, f"R^2: {round(yellow_data[2] ** 2, 2)}", (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 222, 89), 2)
+        # draw a yellow line on th image
+        cv2.line(img, (0, white_data[1]), (img.shape[1], img.shape[1] * white_data[0] + white_data[1]), (255, 0, 0), 2)
+        cv2.putText(img, f"R^2: {round(white_data[2] ** 2, 2)}", (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+
+        cv2.imshow("Lane Detection", img)
+        cv2.waitKey(1)
 
     def load_conf(self,path):
 
