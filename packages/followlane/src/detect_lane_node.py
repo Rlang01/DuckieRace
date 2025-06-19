@@ -91,17 +91,20 @@ class DetectLaneNode(DTROS):
         msg_desired_center.data = error
         self.pub_lane.publish(msg_desired_center)
 
-        img_view = self.show_view(img, view_data_y, view_data_w)
+        # combine both masks
+        img_view = cv2.bitwise_or(mask_white, mask_yellow)
+
+        img_view = self.show_view(img_view, view_data_y, view_data_w)
         cv2.imshow("Lane Detection", img_view)
         cv2.waitKey(1)
 
 
     def show_view(self, img, yellow_data=[0,0,0], white_data=[0,0,0]):
         # draw a yellow line on th image
-        cv2.line(img, (0, yellow_data[1]), (img.shape[1], img.shape[1] * yellow_data[0] + yellow_data[1]), (255, 222, 89), 2)
+        cv2.line(img, (0, int(yellow_data[1])), (img.shape[1], int(img.shape[1] * yellow_data[0] + yellow_data[1])), (255, 222, 89), 2)
         cv2.putText(img, f"R^2: {round(yellow_data[2] ** 2, 2)}", (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 222, 89), 2)
         # draw a yellow line on th image
-        cv2.line(img, (0, white_data[1]), (img.shape[1], img.shape[1] * white_data[0] + white_data[1]), (255, 0, 0), 2)
+        cv2.line(img, (0, int(white_data[1])), (img.shape[1], int(img.shape[1] * white_data[0] + white_data[1])), (255, 0, 0), 2)
         cv2.putText(img, f"R^2: {round(white_data[2] ** 2, 2)}", (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
         return img
