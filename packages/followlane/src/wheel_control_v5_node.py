@@ -3,38 +3,38 @@
 import os
 import rospy
 from duckietown.dtros import DTROS, NodeType
-from std_msgs.msg import Float32
-from duckietown_msgs.msg import WheelsCmdStamped
+from duckietown_msgs.msg import Twist2DStamped
+from std_msgs.msg import Float64
 
+VELOCITY = 0.3  # vitesse linéaire
+KP = 4.0         # gain proportionnel
 
-class LineFollowerNode(DTROS):
-	def __init__(self, node_name):
-       	 super(LineFollowerNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
+class TwistControlNode(DTROS):
+    def __init__(self, node_name):
+        super(TwistControlNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
+        
+        vehicle_name = os.environ['VEHICLE_NAME']
+        twist_topic  = f"/{vehicle_name}/car_cmd_switch_node/cmd"
+        vision_topic = f"/{vehicle_name}/detect/lane"
 
-       	 self.vehicle_name = os.environ['VEHICLE_NAME']
-      	  twist_topic = f"/{self.vehicle_name}/car_cmd_switch_node/cmd"
-      	  self._publisher = rospy.Publisher(twist_topic, Twist2DStamped, queue_size=1)
+        self._v = VELOCITY
+        self.k_p = KP
+        self.error = 0.0
+        self._omega = 0.0
 
-      	  # Abonnement à la position de la ligne détectée
-          rospy.Subscriber(f"/{self._vehicle_name}/detect/lane", Float64, self.callback_position, queue_size=1)
-
-       	 self.base_speed = 0.3  # vitesse linéaire constante
-       	 self.k_p = 2.0         # gain proportionnel à ajuster selon les performances
-       	 self.error = 0.0
+        self._publisher = rospy.Publisher(twist_topic, Twist2DStamped, queue_size=1)
+        rospy.Subscriber(vision_topic, Float64, self.callback_position)
 
     def callback_position(self, msg):
         self.error = msg.data
+        self._omega = self.k_p * self.error
 
-   def run(self):
-        rate = rospy.Rate(10)  # fréquence 10 Hz
+    def run(self):
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
-            # Calcul de la correction angulaire
-            correction = self.k_p * self.error
-
             msg = Twist2DStamped()
-            msg.v = self.base_speed         # vitesse linéaire constante
-            msg.omega = correction          # correction angulaire (omega)
-	          print (msg.omega)
+            msg.v = self._v
+            msg.omega = self._omega
             self._publisher.publish(msg)
             rate.sleep()
 
@@ -43,8 +43,7 @@ class LineFollowerNode(DTROS):
         self._publisher.publish(stop)
 
 if __name__ == '__main__':
-    node = LineFollowerNode(node_name='line_follower_node')
+    node = TwistControlNode(node_name='twist_control_node')
     rospy.on_shutdown(node.on_shutdown)
     node.run()
-    rospy.spin()	
-
+    rospy.spin()
