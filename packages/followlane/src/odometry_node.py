@@ -10,11 +10,10 @@ from duckietown.dtros import DTROS, NodeType
 class OdometryNode(DTROS):
     def __init__(self,node_name):
         super(OdometryNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
-        
         self._vehicle_name = os.environ['VEHICLE_NAME']
-        self.sub_control = rospy.Subscriber(f"/{self._vehicle_name}/switch/control", self.cb_control, queue_size = 1)
-        self.sub_imu = rospy.Subscriber(f"/{self._vehicle_name}/imu_node/data", self.data_callback, queue_size = 1)
-        self.sub_temperature = rospy.Subscriber(f"/{self._vehicle_name}/imu_node/temperature", self.temperature_callback, queue_size = 1)
+        self.sub_control = rospy.Subscriber(f"/{self._vehicle_name}/switch/control", Int32, self.cb_control)
+        self.sub_imu = rospy.Subscriber(f"/{self._vehicle_name}/imu_node/data", Imu, self.data_callback)
+        self.sub_temperature = rospy.Subscriber(f"/{self._vehicle_name}/imu_node/temperature", Temperature, self.temperature_callback)
 
     def cb_control(self, msg):
         print(f"Control mode: {msg.data}")

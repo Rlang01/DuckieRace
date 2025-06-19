@@ -15,8 +15,8 @@ class WheelEncoderNode(DTROS):
         self.enable = False
         self._vehicle_name = os.environ['VEHICLE_NAME']
 
-        self.sub_encoder_left = rospy.Subscriber(f"/{self._vehicle_name}/left_wheel_encoder_driver_node/tick", self.left_callback, queue_size = 1)
-        self.sub_encoder_right = rospy.Subscriber(f"/{self._vehicle_name}/right_wheel_encoder_driver_node/tick", self.right_callback, queue_size = 1)
+        self.sub_encoder_left = rospy.Subscriber(f"/{self._vehicle_name}/left_wheel_encoder_driver_node/tick", WheelEncoderStamped, self.left_callback)
+        self.sub_encoder_right = rospy.Subscriber(f"/{self._vehicle_name}/right_wheel_encoder_driver_node/tick", WheelEncoderStamped, self.right_callback)
 
     def left_callback(self, msg):
         print(f"#ticks (left): {msg.data}")

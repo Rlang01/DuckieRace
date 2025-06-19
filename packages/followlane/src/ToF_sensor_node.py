@@ -13,7 +13,7 @@ class ToFSensorNode(DTROS):
         
         self.enable = False
         self._vehicle_name = os.environ['VEHICLE_NAME']
-        self.sub_ToF = rospy.Subscriber(f"/{self._vehicle_name}/front_center_tof_driver_node/range", self.cb_ToF, queue_size = 1)
+        self.sub_ToF = rospy.Subscriber(f"/{self._vehicle_name}/front_center_tof_driver_node/range", Range, self.cb_ToF)
 
     def cb_ToF(self, msg):
         distance: str = f"{msg.range:.3f}m" if msg.range < msg.max_range else "Too-far"
