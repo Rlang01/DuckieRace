@@ -30,7 +30,7 @@ class OdometryNode(DTROS):
         self.last_time = None
 
     def cb_control(self, msg):
-        rospy.loginfo(f"Control mode: {msg.data}")
+        print(f"Control mode: {msg.data}")
 
     def data_callback(self, msg: Imu):
         current_time = msg.header.stamp.to_sec()
@@ -60,6 +60,7 @@ class OdometryNode(DTROS):
         self.alpha += angular_vel_z * dt
 
         # Publish pose
+        print(f"Pose: x={round(self.x,2)}, y={round(self.y,2)}, alpha={round(self.alpha,2)}")
         pose = Pose2D()
         pose.x = self.x
         pose.y = self.y
@@ -71,6 +72,5 @@ class OdometryNode(DTROS):
 
 
 if __name__ == '__main__':
-    rospy.init_node('odometry_node')
     node = OdometryNode(node_name='odometry_node')
     rospy.spin()
