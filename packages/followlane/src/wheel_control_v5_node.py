@@ -28,31 +28,45 @@ class TwistControlNode(DTROS):
 
         self._theta_ref = 0.0  # direction idéale (ex: 0 radian = tout droit)
         self._theta_hat = 0.0  # angle mesuré reçu de la vision
+        self._theta_hat_smoothed = 0.0  # geglätteter Winkelwert
 
-        # Souscription à l'erreur de vision
+        # EWMA-Glättungsfaktor (nahe 1 = stärker geglättet)
+        self.ewma_alpha = 0.9
+
+        # Abonnieren des Vision-Themas für die Winkelmessung
         rospy.Subscriber(f"/{self._vehicle_name}/detect/lane", Float64, self.callback_position)
 
+    def ewma_filter(self, new_value):
+        """
+        Exponentieller gleitender Durchschnitt (EWMA)
+        Glättet den neuen Messwert anhand des vorherigen geglätteten Wertes.
+        """
+        self._theta_hat_smoothed = self.ewma_alpha * self._theta_hat_smoothed + (1 - self.ewma_alpha) * new_value
+        return self._theta_hat_smoothed
+
     def callback_position(self, msg):
+        # Neuer Winkelwert von der Vision
         self._theta_hat = msg.data
+        # Anwenden der EWMA-Glättung
+        self.ewma_filter(self._theta_hat)
 
     def run(self):
         rate = rospy.Rate(10)  # 10 Hz
         while not rospy.is_shutdown():
-            # Temps écoulé depuis dernière exécution
             current_time = time.time()
             delta_t = current_time - self.last_time
             self.last_time = current_time
 
-            # Calcul de l'erreur
-            error = self._theta_ref - self._theta_hat
+            # Verwende den geglätteten Winkelwert für die Fehlerberechnung
+            error = self._theta_ref - self._theta_hat_smoothed
             self.integral_error += error * delta_t
             derivative_error = (error - self.prev_error) / delta_t if delta_t > 0 else 0.0
             self.prev_error = error
 
-            # Calcul de la commande PID
+            # PID-Steuerung berechnen
             omega = self.k_p * error + self.k_i * self.integral_error + self.k_d * derivative_error
 
-            # Création et publication du message
+            # Erstelle und sende den Steuerbefehl
             msg = Twist2DStamped()
             msg.v = self._v
             msg.omega = omega
@@ -61,6 +75,7 @@ class TwistControlNode(DTROS):
             rate.sleep()
 
     def on_shutdown(self):
+        # Stoppt den Roboter sicher beim Herunterfahren
         stop = Twist2DStamped(v=0.0, omega=0.0)
         self._publisher.publish(stop)
 
