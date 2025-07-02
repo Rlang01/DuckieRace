@@ -33,12 +33,7 @@ class ControlObstacleNode(DTROS):
             rospy.logerr("Ungültige Geometrie: lateral_shift zu groß für diesen Radius.")
             self.turn_distance = 1.0  # Fallback-Wert
 
-        # === Gesamte Strecke für Hin- und Rückkurve ===
-        self.total_distance = 2 * self.turn_distance
-
         # === Interner Zustand ===
-        self.s_current = 0.0                     # Aktuelle Strecke seit Start des Ausweichens
-        self.phase = 0                           # 0 = hinlenken, 1 = zurücklenken
         self.avoiding = False                    # Aktiver Ausweichstatus
         self.pose_current = Pose2D()             # Aktuelle Pose (aus Odometrie)
         self.pose_start = None                   # Startposition bei Beginn des Ausweichmanövers
@@ -68,32 +63,30 @@ class ControlObstacleNode(DTROS):
     def cb_pose(self, msg: Pose2D):
         self.pose_current = msg
 
-    # === Berechnung der seit Start gefahrenen Strecke (euklidisch) ===
+    # === Berechnung der seitlichen Verschiebung (nur y-Richtung) ===
     def compute_distance(self):
-        dx = self.pose_current.x - self.pose_start.x
-        dy = self.pose_current.y - self.pose_start.y
-        return np.sqrt(dx**2 + dy**2)
+        return abs(self.pose_current.y - self.pose_start.y)
 
     # === Hauptloop ===
     def run(self):
         rate = rospy.Rate(30)  # 30 Hz
         while not rospy.is_shutdown():
             if self.avoiding and self.pose_start:
-                self.s_current = self.compute_distance()  # Strecke per Odometrie bestimmen
-                self.execute_step()
+                s_current = self.compute_distance()  # Seitliche Strecke per Odometrie bestimmen
+                self.execute_step(s_current)
             rate.sleep()
 
     # === Führt einen Schritt des Ausweichmanövers aus ===
-    def execute_step(self):
-        if self.s_current >= self.total_distance:
-            rospy.loginfo("Ausweichmanöver abgeschlossen (Odometrie-basiert).")
+    def execute_step(self, s_current):
+        if s_current >= self.lateral_shift:
+            rospy.loginfo("Ausweichmanöver abgeschlossen (seitlicher Versatz erreicht).")
             self.avoiding = False
             self.send_stop()
             self.publish_done(True)
             return
 
         # Phase: Hin- oder Rückkurve
-        if self.s_current < self.turn_distance:
+        if s_current < (self.lateral_shift / 2):
             omega = self.direction * self.omega
         else:
             omega = -self.direction * self.omega
