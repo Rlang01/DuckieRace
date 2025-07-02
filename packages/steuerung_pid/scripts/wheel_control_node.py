@@ -38,4 +38,4 @@ class WheelControlNode(DTROS):
 if __name__ == '__main__':
    node = WheelControlNode(node_name='wheel_control_node')
    node.run()
-   rospy.spin(
+   rospy.spin()

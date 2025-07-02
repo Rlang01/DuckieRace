@@ -24,7 +24,7 @@ class ControlLaneNode(DTROS):
         rospy.on_shutdown(self.fnShutDown)
 
     def cbControl(self,msg):
-        if msg.data == ControlType.Lane.value:
+        if msg.data == ControlType.followlane.value:    #aus Lane followlane gemacht
             self.enable = True
         
         else:

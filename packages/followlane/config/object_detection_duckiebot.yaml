@@ -1,0 +1,12 @@
+# packages/followlane/config/detect_duckiebot.yaml
+
+camera:
+  focal_length_px: 500.0       # Fokale Länge in Pixeln (aus Kalibrierung)
+
+general:
+  frame_skip: 3                # Nur jedes n-te Bild auswerten
+
+duckiebot:
+  class_id: 0
+  height_m: 0.12               # 12 cm
+  min_box_area: 10000
