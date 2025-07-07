@@ -11,11 +11,10 @@ from std_msgs.msg import Bool, Float64
 from ultralytics import YOLO
 from cv_bridge import CvBridge
 
-class DetectDuckiebotNode(DTROS):
+class CameraReaderNodeFocallength(DTROS):  # Klassenname angepasst
     def __init__(self, node_name):
-        super(DetectDuckiebotNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
+        super(CameraReaderNodeFocallength, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
 
-        # Nutze jetzt separate YAML nur für Duckiebot
         self.config_path = "packages/followlane/config/object_detection_duckiebot.yaml"
         self.load_conf(self.config_path)
 
@@ -109,8 +108,8 @@ class DetectDuckiebotNode(DTROS):
 
     def on_shutdown(self):
         cv2.destroyAllWindows()
-        rospy.loginfo("DetectDuckiebotNode wurde sauber beendet.")
+        rospy.loginfo("CameraReaderNodeFocallength wurde sauber beendet.")
 
 if __name__ == '__main__':
-    node = DetectDuckiebotNode(node_name='detect_duckiebot_node')
+    node = CameraReaderNodeFocallength(node_name='camera_reader_node_focallength')  # Klassennamen korrigiert
     rospy.spin()

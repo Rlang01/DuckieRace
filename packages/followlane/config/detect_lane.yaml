@@ -1,3 +1,5 @@
+# packages/followlane/config/detect_lane.yaml
+
 duck:
   hh: 83
   hl: 15
@@ -26,6 +28,13 @@ yellow:
   hl: 20
   sh: 255
   sl: 80
+  vh: 255
+  vl: 100
+red:
+  hh: 10
+  hl: 0
+  sh: 255
+  sl: 100
   vh: 255
   vl: 100
 mapping:
