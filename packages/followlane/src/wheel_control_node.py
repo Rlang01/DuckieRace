@@ -7,10 +7,10 @@ from duckietown_msgs.msg import Twist2DStamped
 from std_msgs.msg import Float64
 import time
 
-class TwistControlNode(DTROS):
+class wheel_control_node(DTROS):
 
     def __init__(self, node_name):
-        super(TwistControlNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
+        super(wheel_control_node, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
 
         self._vehicle_name = os.environ['VEHICLE_NAME']
         twist_topic = f"/{self._vehicle_name}/car_cmd_switch_node/cmd"
@@ -95,7 +95,7 @@ class TwistControlNode(DTROS):
         self._publisher.publish(stop)
 
 if __name__ == '__main__':
-    node = TwistControlNode(node_name='twist_control_node')
+    node = wheel_control_node(node_name='wheel_control_node')
     rospy.on_shutdown(node.on_shutdown)
     node.run()
     rospy.spin()
